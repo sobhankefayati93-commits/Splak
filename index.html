@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Splack Search | جست‌وجوی هوشمند وب</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap');
+:root{color-scheme:dark;--bg:#100d18;--panel:#1b1626;--line:#352b46;--purple:#9565f5;--muted:#aaa0b8}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#38225a 0,transparent 55%),var(--bg);color:#f7f3ff;font-family:Vazirmatn,system-ui,sans-serif;min-height:100vh}
+header{max-width:900px;margin:0 auto;padding:26px 22px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:25px;font-weight:800;letter-spacing:-1px}.brand span{color:#b99aff}.tag{color:#c8b8e9;font-size:12px;border:1px solid #594476;padding:5px 10px;border-radius:99px}
+main{max-width:820px;margin:8vh auto 60px;padding:0 20px}.hero{text-align:center;margin-bottom:30px}.mark{font-size:42px;color:#b99aff}.hero h1{font-size:clamp(28px,5vw,43px);margin:8px 0}.hero p{color:var(--muted);margin:0}
+.search{display:flex;gap:10px;background:#211a2e;border:1px solid #49385f;padding:9px;border-radius:18px;box-shadow:0 18px 60px #0005}.search input{flex:1;min-width:0;background:transparent;border:0;outline:0;color:white;font:inherit;padding:9px 12px}.search button{border:0;border-radius:12px;background:linear-gradient(135deg,#a47aff,#7045d2);color:white;font:inherit;font-weight:700;padding:10px 22px;cursor:pointer}.search button:disabled{opacity:.55;cursor:wait}
+.hint{text-align:center;color:#8f849d;font-size:12px;margin:13px}.status{margin:26px 0 12px;color:#c8b8e9;font-size:14px}.results{display:grid;gap:13px}.result{background:linear-gradient(145deg,#211a2d,#191421);border:1px solid var(--line);border-radius:15px;padding:17px}.result h3{font-size:17px;margin:0 0 7px}.result h3 a{color:#d8c5ff;text-decoration:none}.result h3 a:hover{text-decoration:underline}.url{font-size:11px;color:#8fbd9b;direction:ltr;text-align:right;overflow-wrap:anywhere}.result p{color:#c6bdcf;font-size:14px;line-height:1.9;margin:8px 0 0}.empty{color:var(--muted);text-align:center;padding:30px;border:1px dashed var(--line);border-radius:15px}.foot{text-align:center;color:#71687c;font-size:11px;margin:34px 0}.error{color:#ffb4b4}
+@media(max-width:560px){header{padding:18px}.search{flex-wrap:wrap}.search input{flex-basis:100%}.search button{width:100%}main{margin-top:5vh}}
+</style>
+</head>
+<body>
+<header><div class="brand">✦ Splack<span> Search</span></div><div class="tag">جست‌وجوی وب</div></header>
+<main>
+<section class="hero"><div class="mark">⌕</div><h1>چی می‌خوای پیدا کنی؟</h1><p>در وب جست‌وجو کن؛ نتیجه‌ها و لینک منابع رو ببین.</p></section>
+<form class="search" id="form"><input id="q" autocomplete="off" placeholder="مثلاً: جدیدترین فناوری‌های هوش مصنوعی" required><button id="btn">جست‌وجو</button></form>
+<div class="hint">فارسی یا انگلیسی بنویس · برای جست‌وجوی دقیق‌تر از چند کلمه استفاده کن</div>
+<div id="status" class="status" aria-live="polite"></div><section id="results" class="results"></section>
+<div class="foot">Splack Search · نتایج از موتورهای جست‌وجوی وب گردآوری می‌شوند.</div>
+</main>
+<script>
+const form=document.querySelector('#form'),q=document.querySelector('#q'),btn=document.querySelector('#btn'),statusBox=document.querySelector('#status'),results=document.querySelector('#results');
+form.addEventListener('submit',async e=>{e.preventDefault();const query=q.value.trim();if(!query)return;btn.disabled=true;statusBox.textContent='در حال جست‌وجو در وب…';results.replaceChildren();
+try{const r=await fetch('/api/search?q='+encodeURIComponent(query));const data=await r.json();if(!r.ok)throw new Error(data.error||'جست‌وجو ناموفق بود');const items=data.results||[];statusBox.textContent=`${items.length} نتیجه برای «${query}»`;if(!items.length){results.innerHTML='<div class="empty">نتیجه‌ای پیدا نشد. عبارت دیگری امتحان کن.</div>';return}
+for(const item of items){const card=document.createElement('article');card.className='result';const h=document.createElement('h3'),a=document.createElement('a');a.href=item.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent=item.title||item.url;h.append(a);const url=document.createElement('div');url.className='url';url.textContent=item.url||'';const p=document.createElement('p');p.textContent=item.content||'توضیحی برای این نتیجه موجود نیست.';card.append(h,url,p);results.append(card)}
+}catch(err){statusBox.textContent='';const box=document.createElement('div');box.className='empty error';box.textContent='خطا در جست‌وجو: '+err.message+' — تنظیمات موتور جست‌وجو را در راهنما بررسی کن.';results.append(box)}finally{btn.disabled=false}});
+</script>
+</body></html>
